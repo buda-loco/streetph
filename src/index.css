@@ -687,6 +687,12 @@ main { flex: 1; overflow: hidden; }
   .gallery-page--blurred .gallery-controls { filter: none !important; }
 }
 
+/* ─── Lightbox: no zoom on touch ────────────────────────── */
+@media (hover: none) {
+  .lb-zoom-hint { display: none !important; }
+  .lb-image { cursor: default !important; }
+}
+
 /* ─── Drawer mobile filter strip ────────────────────────── */
 .drawer-filter-strip {
   display: none;
@@ -700,6 +706,7 @@ main { flex: 1; overflow: hidden; }
     scrollbar-width: none;
     padding: 8px 0 !important;
     flex-shrink: 0;
+    background: #080808;
     border-bottom: 1px solid var(--border);
     overscroll-behavior-x: contain;
   }

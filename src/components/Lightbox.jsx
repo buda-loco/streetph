@@ -104,6 +104,8 @@ export default function Lightbox({ photo, photos, onClose, onNav }) {
   }, [zoomed, zoomOrigin])
 
   const handleImageClick = (e) => {
+    // No zoom on touch devices — tap is navigation, not zoom
+    if (window.matchMedia('(hover: none)').matches) return
     if (zoomed) { setZoomed(false); return }
     const rect = e.currentTarget.getBoundingClientRect()
     setZoomOrigin({

@@ -6,12 +6,12 @@ const STICKY_COLORS = ['#FFFF88', '#A6CCF5', '#EA94BB', '#D5F692']
 // Positions: mostly hanging off polaroid edges/corners so photo is minimally obscured.
 // Each entry sets top/right/left/bottom + rotation as inline style.
 const STICKY_CONFIGS = [
-  { top: '-12px', right: '-16px',                  transform: 'rotate(4deg)'  },
-  { top: '-12px', left:  '-16px', right: 'auto',   transform: 'rotate(-3deg)' },
-  { top: '-12px', right:  '28px',                  transform: 'rotate(2deg)'  },
-  { top: '-12px', left:   '28px', right: 'auto',   transform: 'rotate(-5deg)' },
-  { top:  '20px', right: '-52px',                  transform: 'rotate(6deg)'  },
-  { top:  '20px', left:  '-52px', right: 'auto',   transform: 'rotate(-4deg)' },
+  { top: '-58px', right: '-16px',                  transform: 'rotate(4deg)'  },
+  { top: '-58px', left:  '-16px', right: 'auto',   transform: 'rotate(-3deg)' },
+  { top: '-58px', right:  '28px',                  transform: 'rotate(2deg)'  },
+  { top: '-58px', left:   '28px', right: 'auto',   transform: 'rotate(-5deg)' },
+  { top: '-28px', right: '-52px',                  transform: 'rotate(6deg)'  },
+  { top: '-28px', left:  '-52px', right: 'auto',   transform: 'rotate(-4deg)' },
 ]
 
 // Stable pseudo-random pick per photo — same photo always gets same config

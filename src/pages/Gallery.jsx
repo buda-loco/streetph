@@ -17,7 +17,7 @@ const BATCH = 9
 
 // Zones keep cards spread but overlapping looks natural — like a real table
 const X_ZONES = [[8, 34], [30, 58], [54, 86]]
-const Y_ZONES = [[10, 40], [36, 66], [60, 88]]
+const Y_ZONES = [[35, 48], [40, 67], [60, 88]]
 
 // Exclusion zone derived from where the cup actually sits (% of scatter-table)
 const CUP_EXCLUSION = { cx: CUP_TARGET.x * 100, cy: CUP_TARGET.y * 100, r: 18 }
