@@ -619,12 +619,12 @@ main { flex: 1; overflow: hidden; }
   .polaroid { width: 155px; padding: 8px 8px 36px; }
   .polaroid-photo-wrap { height: 150px; }
   .sticky-note { width: 76px; font-size: 10px; top: -14px; right: -10px; }
-  /* Lightbox — scrollable column: image then description */
-  .lb-overlay { overflow-y: auto; align-items: flex-start; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
-  .lb-shell { flex-direction: column; height: auto; min-height: 100%; }
+  /* Lightbox — scrollable column: shell scrolls (not overlay — avoids iOS fixed+overflow bug) */
+  .lb-overlay { align-items: flex-start; }
+  .lb-shell { flex-direction: column; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
   .lb-media { padding: 3.5rem 1rem 1rem; flex: none; height: auto; overflow: visible; }
   .lb-image { max-height: none; width: 100%; }
-  .lb-details { width: 100%; border-left: none; border-top: 1px solid var(--border); padding: 1.5rem 1.25rem 2.5rem; flex: none; }
+  .lb-details { width: 100%; border-left: none; border-top: 1px solid var(--border); padding: 1.5rem 1.25rem 2.5rem; flex: none; overflow-y: visible; }
   .lb-nav { display: none; }
   .coffee-scene { display: none; }
 
@@ -897,7 +897,7 @@ main { flex: 1; overflow: hidden; }
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 2000;
+  z-index: 1600;
   pointer-events: none;
 }
 
@@ -984,10 +984,10 @@ main { flex: 1; overflow: hidden; }
 .bio-note-close:hover { background: #000; color: #fff; }
 .bio-note-close i { font-size: 0.72rem; }
 
-/* Mobile — narrower note */
+/* Mobile — hide bio note entirely (desktop-only feature) */
 @media (max-width: 600px) {
-  .bio-note { width: calc(100vw - 24px); }
-  .bio-sentence { font-size: 13px; line-height: 1.55; }
+  .bio-note-outer { display: none !important; }
+  .bio-overlay { display: none !important; }
 }
 
 /* ─── Lightbox logo stamp ────────────────────────────────── */
