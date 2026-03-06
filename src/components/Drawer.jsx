@@ -6,17 +6,16 @@ function toCols(photos, n) {
   return cols
 }
 
-export default function Drawer({ photos, open, onClose, onPhotoClick }) {
-  const scrollRef  = useRef(null)
-  const colRefs    = useRef([])
-  // Increments each time drawer opens — used as key to restart stagger animations
+export default function Drawer({ photos, open, onClose, onPhotoClick, tags, activeTag, onTagSelect }) {
+  const scrollRef = useRef(null)
+  const colRefs   = useRef([])
   const [epoch, setEpoch] = useState(0)
 
   useEffect(() => {
     if (open) setEpoch(e => e + 1)
   }, [open])
 
-  // Parallax — direct DOM, no re-renders
+  // Desktop parallax scroll
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
@@ -34,6 +33,11 @@ export default function Drawer({ photos, open, onClose, onPhotoClick }) {
   useEffect(() => {
     if (open && scrollRef.current) scrollRef.current.scrollTop = 0
   }, [open])
+
+  // Filtered photos for mobile (all photos filtered by tag)
+  const mobilePhotos = activeTag
+    ? photos.filter(p => p.tags?.includes(activeTag))
+    : photos
 
   const cols = toCols(photos, 3)
 
@@ -55,9 +59,30 @@ export default function Drawer({ photos, open, onClose, onPhotoClick }) {
           </button>
         </div>
 
+        {/* Mobile filter strip — horizontal scroll with spacer gutters */}
+        {tags?.length > 0 && (
+          <div className="drawer-filter-strip">
+            <button
+              className={`filter-btn${!activeTag ? ' active' : ''}`}
+              onClick={() => onTagSelect?.(null)}
+            >
+              All
+            </button>
+            {tags.map(tag => (
+              <button
+                key={tag}
+                className={`filter-btn${activeTag === tag ? ' active' : ''}`}
+                onClick={() => onTagSelect?.(tag)}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="drawer-scroll" ref={scrollRef}>
 
-          {/* Desktop: 3-col parallax masonry — epoch key restarts stagger animations */}
+          {/* Desktop: 3-col parallax masonry */}
           <div key={`d-${epoch}`} className="masonry-grid masonry-grid--desktop">
             {cols.map((col, ci) => (
               <div
@@ -81,13 +106,13 @@ export default function Drawer({ photos, open, onClose, onPhotoClick }) {
             ))}
           </div>
 
-          {/* Mobile: single column */}
-          <div key={`m-${epoch}`} className="masonry-grid masonry-grid--mobile">
-            {photos.map((photo, i) => (
+          {/* Mobile: single column with staggered CSS animation */}
+          <div key={`m-${activeTag}`} className="masonry-grid masonry-grid--mobile">
+            {mobilePhotos.map((photo, i) => (
               <button
                 key={photo.id}
                 className="masonry-item"
-                style={{ '--delay': `${0.28 + i * 0.055}s` }}
+                style={{ '--delay': `${0.05 + i * 0.06}s` }}
                 onClick={() => { onPhotoClick(photo); onClose() }}
               >
                 <img src={photo.dropbox} alt={photo.title || ''} loading="lazy" draggable="false" />

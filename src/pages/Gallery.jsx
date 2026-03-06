@@ -92,18 +92,20 @@ function computeScatter(count, seed, exclusion = null) {
 
 // ── Component ─────────────────────────────────────────────────────────
 export default function Gallery({ photos }) {
-  const canvasRef    = useRef(null)
-  const cardRefs     = useRef([])
-  const shadowRafRef = useRef(null)
-  const lightMouse   = useRef({ x: window.innerWidth / 2, y: window.innerHeight / 2 })
-  const lightTarget  = useRef({ ...lightMouse.current })
-  const topZRef      = useRef(30)   // grows with each bring-to-front; cup is 1000
+  const canvasRef      = useRef(null)
+  const cardRefs       = useRef([])
+  const shadowRafRef   = useRef(null)
+  const lightMouse     = useRef({ x: window.innerWidth / 2, y: window.innerHeight / 2 })
+  const lightTarget    = useRef({ ...lightMouse.current })
+  const topZRef        = useRef(30)
+  const pendingAnimRef = useRef({})   // i → { el, delay } — triggered on image load
 
   const [activeTag,     setActiveTag]     = useState(null)
   const [shuffleKey,    setShuffleKey]    = useState(0)
   const [isShuffling,   setIsShuffling]   = useState(false)
   const [lightboxPhoto, setLightboxPhoto] = useState(null)
   const [drawerOpen,    setDrawerOpen]    = useState(false)
+  const [bioVisible,    setBioVisible]    = useState(false)
   // Sleeper Polaroid peeks out from under the cup's top-left side
   const sleeperPos = { x: CUP_TARGET.x * 100 - 8, y: CUP_TARGET.y * 100 - 9 }
 
@@ -199,8 +201,9 @@ export default function Gallery({ photos }) {
     }
   }, [])
 
-  // ── Fall-in on batch change ──────────────────────────────────────────
+  // ── Fall-in on batch change — triggered per-card on image load ──────
   useEffect(() => {
+    pendingAnimRef.current = {}
     const sleeperIdx = batch.length - 1
     cardRefs.current.forEach((el, i) => {
       if (!el) return
@@ -211,25 +214,33 @@ export default function Gallery({ photos }) {
         xPercent: -50, yPercent: -50, rotation, zIndex,
         x: 0, opacity: 0, y: -180,
         rotateX: 0, rotateY: 0,
-        transformPerspective: 800,   // enables 3D tilt during drag
+        transformPerspective: 800,
       })
-      gsap.to(el, {
-        y:        0,
-        opacity:  1,
-        duration: 0.75,
-        ease:     'back.out(1.6)',
-        delay:    0.55 + i * 0.07,
-        onStart: () => {
-          const img = el.querySelector('.polaroid-photo')
-          if (img) {
-            img.classList.remove('developing')
-            void img.offsetWidth   // force reflow so animation restarts
-            img.classList.add('developing')
-          }
-        },
-      })
+      pendingAnimRef.current[i] = { el, delay: 0.1 + i * 0.07 }
     })
   }, [batch, layout])
+
+  // Called by PolaroidCard when its photo finishes loading (or is already cached)
+  const onCardLoaded = useCallback((i) => {
+    const pending = pendingAnimRef.current[i]
+    if (!pending) return
+    const { el, delay } = pending
+    delete pendingAnimRef.current[i]
+
+    const img = el.querySelector('.polaroid-photo')
+    if (img) {
+      img.classList.remove('developing')
+      void img.offsetWidth
+      img.classList.add('developing')
+    }
+
+    gsap.to(el, {
+      y: 0, opacity: 1,
+      duration: 0.75,
+      ease: 'back.out(1.6)',
+      delay,
+    })
+  }, [])
 
   // ── Filter blow-away ────────────────────────────────────────────────
   useEffect(() => {
@@ -480,6 +491,7 @@ export default function Gallery({ photos }) {
               <PolaroidCard
                 photo={photo}
                 onClick={() => setLightboxPhoto(photo)}
+                onImageLoad={() => onCardLoaded(i)}
               />
             </div>
           )
@@ -490,7 +502,11 @@ export default function Gallery({ photos }) {
         double-click a photo to open it
       </div>
 
-      <BioText />
+      <div className={`bio-overlay${bioVisible ? ' bio-overlay--active' : ''}`} />
+      <BioText
+        onShow={() => setBioVisible(true)}
+        onDismissStart={() => setBioVisible(false)}
+      />
 
       <CoffeeCup />
 
@@ -501,6 +517,9 @@ export default function Gallery({ photos }) {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         onPhotoClick={setLightboxPhoto}
+        tags={tags}
+        activeTag={activeTag}
+        onTagSelect={setActiveTag}
       />
 
       {lightboxPhoto && (

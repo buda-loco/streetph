@@ -570,6 +570,8 @@ main { flex: 1; overflow: hidden; }
 }
 
 .about-bio { font-family: var(--font-serif); font-size: 1.03rem; line-height: 1.85; color: var(--text); }
+.about-bio a { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+.about-bio a:hover { opacity: 0.75; }
 .about-bio p { margin-bottom: 1.4em; }
 
 .about-links { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 2.5rem; }
@@ -610,7 +612,9 @@ main { flex: 1; overflow: hidden; }
   .sticky-note { width: 90px; font-size: 11px; }
 }
 @media (max-width: 600px) {
+  /* Nav: socials hidden here — shown as fixed bottom bar instead */
   .nav-socials { display: none; }
+
   .polaroid { width: 155px; padding: 8px 8px 36px; }
   .polaroid-photo-wrap { height: 150px; }
   .sticky-note { width: 76px; font-size: 10px; top: -14px; right: -10px; }
@@ -620,11 +624,124 @@ main { flex: 1; overflow: hidden; }
   .lb-details { width: 100%; border-left: none; border-top: 1px solid var(--border); padding: 1.5rem 1.25rem; flex: 1; }
   .lb-nav { display: none; }
   .coffee-scene { display: none; }
-  /* Drawer full-screen on mobile */
-  .drawer { width: 100%; right: 0; }
-  .masonry-grid--desktop { display: none; }
-  .masonry-grid--mobile  { display: flex; }
-  .gallery-view-btn { display: flex; }
+
+  /* Mobile: hide scatter view, always show drawer */
+  #table-canvas,
+  .scatter-table,
+  .gallery-hint,
+  .gallery-controls { display: none !important; }
+
+  /* Drawer always visible, full-width, sits below nav, above social bar */
+  .drawer {
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: var(--nav-h) !important;
+    height: calc(100dvh - var(--nav-h) - 52px) !important;
+    transform: none !important;
+    border-left: none !important;
+    border-top: 1px solid var(--border) !important;
+    background: #050505 !important;
+  }
+  .drawer-header  { display: none !important; }
+  .drawer-backdrop { display: none !important; }
+  .drawer-close   { display: none !important; }
+
+  /* Masonry: 1 column with side padding */
+  .drawer-header { display: none; }
+  .masonry-grid--desktop { display: none !important; }
+  .masonry-grid--mobile  { display: flex !important; flex-direction: column !important; padding: 0 40px; }
+  .masonry-grid--mobile .masonry-item { width: 100%; animation: masonryReveal 0.6s cubic-bezier(0.16,1,0.3,1) both; animation-delay: var(--delay, 0s); }
+  .drawer-scroll { padding: 12px 0 0 !important; overscroll-behavior: contain; }
+
+  /* Music toast — dark, minimal, above social bar */
+  .music-toast {
+    background: rgba(10,10,10,0.96) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.55) !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    white-space: normal !important;
+    width: auto !important;
+    max-width: calc(100vw - 48px) !important;
+    border-radius: 12px !important;
+    padding: 16px 18px !important;
+    bottom: 68px !important;
+  }
+  .music-toast-icon { color: rgba(255,255,255,0.4) !important; font-size: 0.95rem !important; }
+  .music-toast-body { gap: 10px !important; align-items: flex-start !important; }
+  .music-toast-text { color: rgba(255,255,255,0.88) !important; font-size: 13px !important; white-space: normal !important; line-height: 1.5 !important; }
+  .music-toast-actions { width: 100% !important; gap: 10px !important; }
+  .music-toast-btn--yes { background: #fff !important; color: #111 !important; font-size: 12px !important; font-weight: 600 !important; padding: 8px 18px !important; border-radius: 6px !important; }
+  .music-toast-btn--no  { color: rgba(255,255,255,0.45) !important; font-size: 12px !important; text-decoration: none !important; }
+
+  /* No blur effect needed on mobile (scatter hidden) */
+  .gallery-page--blurred #table-canvas,
+  .gallery-page--blurred .scatter-table,
+  .gallery-page--blurred .gallery-controls { filter: none !important; }
+}
+
+/* ─── Drawer mobile filter strip ────────────────────────── */
+.drawer-filter-strip {
+  display: none;
+}
+@media (max-width: 600px) {
+  .drawer-filter-strip {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 10px 0;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+    overscroll-behavior-x: contain;
+  }
+  .drawer-filter-strip::before,
+  .drawer-filter-strip::after { content: ''; min-width: 40px; flex-shrink: 0; }
+  .drawer-filter-strip::-webkit-scrollbar { display: none; }
+  .drawer-filter-strip .filter-btn {
+    flex-shrink: 0;
+    min-height: 36px;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    font-size: 0.68rem;
+  }
+}
+
+/* ─── Mobile fixed social bottom bar ────────────────────── */
+.mobile-social-bar { display: none; }
+@media (max-width: 600px) {
+  .mobile-social-bar {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 52px;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+    background: rgba(5,5,5,0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(160,160,160,0.1);
+    z-index: 2500;
+  }
+  .mobile-social-bar a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 1.3rem;
+    text-decoration: none;
+    transition: color 0.2s;
+    padding: 10px 16px;
+  }
+  .mobile-social-bar a:hover { color: var(--accent); }
 }
 
 /* ─── Gallery view toggle button ─────────────────────────── */
@@ -661,25 +778,22 @@ main { flex: 1; overflow: hidden; }
   filter: blur(5px);
 }
 
-/* ─── Music toast (top-left, subtle) ─────────────────────── */
+/* ─── Music toast (centered pill bar) ────────────────────── */
 .music-toast {
   position: fixed;
-  top: calc(var(--nav-h) + 16px);
-  left: 20px;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(140%);
   z-index: 3000;
-  width: 260px;
-  background: rgba(10, 10, 10, 0.88);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 4px;
-  padding: 12px 14px 10px;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-  /* Slide in from the left */
+  align-items: center;
+  gap: 16px;
+  background: #efefef;
+  border-radius: 100px;
+  padding: 14px 20px 14px 24px;
+  white-space: nowrap;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
   opacity: 0;
-  transform: translateX(-110%);
   transition:
     opacity   0.5s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
@@ -687,24 +801,25 @@ main { flex: 1; overflow: hidden; }
 }
 .music-toast--visible {
   opacity: 1;
-  transform: translateX(0);
+  transform: translateX(-50%) translateY(0);
   pointer-events: all;
 }
 
-.music-toast-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
-}
 .music-toast-icon {
-  color: var(--accent);
-  font-size: 0.9rem;
+  color: #111;
+  font-size: 1.1rem;
   flex-shrink: 0;
   margin-top: 2px;
 }
+.music-toast-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 .music-toast-text {
   font-family: var(--font-ui);
-  font-size: 0.72rem;
+  color: #111;
+  font-size: 1rem;
   line-height: 1.5;
   color: var(--text-muted);
   margin: 0;
@@ -713,45 +828,68 @@ main { flex: 1; overflow: hidden; }
 .music-toast-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding-left: 22px; /* align under the text */
+  gap: 12px;
+  margin-left: 4px;
 }
 .music-toast-btn {
   display: inline-flex;
   align-items: center;
+  cursor: pointer;
+  font-family: var(--font-ui);
   gap: 0.3rem;
   font-family: var(--font-ui);
-  font-size: 0.65rem;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
   cursor: pointer;
-  border-radius: 2px;
+  font-family: var(--font-ui);
   transition: all 0.18s;
   white-space: nowrap;
 }
 .music-toast-btn--yes {
-  background: var(--accent);
-  border: 1px solid var(--accent);
-  color: #000;
-  padding: 4px 12px;
+  background: #111;
+  border: none;
+  border-radius: 100px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 10px 22px;
 }
-.music-toast-btn--yes:hover { background: var(--text); border-color: var(--text); }
+.music-toast-btn--yes:hover { background: #333; }
 .music-toast-btn--no {
   background: none;
   border: none;
-  color: var(--text-muted);
-  padding: 4px 6px;
+  color: #666;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 0;
 }
-.music-toast-btn--no:hover { color: var(--text); }
+.music-toast-btn--no:hover { color: #111; }
 
 /* ─── Bio sticky note ────────────────────────────────────── */
 /* Outer: CSS centering only — never touched by GSAP */
+/* ─── Bio overlay (blurs/darkens gallery while note is up) ── */
+.bio-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  pointer-events: none;
+  transition:
+    background      0.85s cubic-bezier(0.16, 1, 0.3, 1),
+    backdrop-filter 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.bio-overlay--active {
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  pointer-events: all;
+}
+
 .bio-note-outer {
   position: fixed;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 50;
+  z-index: 2000;
   pointer-events: none;
 }
 

@@ -22,7 +22,7 @@ function parseInline(sentence) {
   return parts
 }
 
-export default function BioText() {
+export default function BioText({ onShow, onDismissStart }) {
   const wrapRef  = useRef(null)
   const lineRefs = useRef([])
   const [dismissed, setDismissed] = useState(false)
@@ -40,7 +40,7 @@ export default function BioText() {
     gsap.set(wrap,  { y: '110%', opacity: 1 })
     gsap.set(lines, { opacity: 0, y: 10 })
 
-    const tl = gsap.timeline({ delay: 1.6 })
+    const tl = gsap.timeline({ delay: 1.6, onStart: () => onShow?.() })
 
     // Note pops up from below with a satisfying bounce
     tl.to(wrap, {
@@ -63,7 +63,7 @@ export default function BioText() {
   const handleClose = () => {
     const wrap = wrapRef.current
     if (!wrap) return
-    // Fade-up: the note lifts upward and fades out
+    onDismissStart?.()
     gsap.to(wrap, {
       y: -60,
       opacity: 0,

@@ -19,18 +19,18 @@ export default function MusicToast({ onYes, onNo }) {
 
   return (
     <div className={`music-toast ${visible ? 'music-toast--visible' : ''}`}>
-      <div className="music-toast-row">
+      <div className="music-toast-body">
         <i className="lni lni-music music-toast-icon" />
         <p className="music-toast-text">
-          I picked a soundtrack — want to listen?
+          This site has a soundtrack — want to listen?
         </p>
       </div>
       <div className="music-toast-actions">
         <button className="music-toast-btn music-toast-btn--yes" onClick={handleYes}>
-          <i className="lni lni-play" /> Play
+          Hell, yes.
         </button>
         <button className="music-toast-btn music-toast-btn--no" onClick={handleNo}>
-          Skip
+          no thanks
         </button>
       </div>
     </div>

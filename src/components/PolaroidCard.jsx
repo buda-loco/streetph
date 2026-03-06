@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useEffect, useRef } from 'react'
 import Logo from './Logo'
 
 const STICKY_COLORS = ['#FFFF88', '#A6CCF5', '#EA94BB', '#D5F692']
@@ -22,7 +22,13 @@ function pickSticky(id) {
   return { color, cfg }
 }
 
-const PolaroidCard = memo(function PolaroidCard({ photo, onClick }) {
+const PolaroidCard = memo(function PolaroidCard({ photo, onClick, onImageLoad }) {
+  const imgRef = useRef(null)
+
+  // Fire onImageLoad for already-cached images (onLoad won't fire for those)
+  useEffect(() => {
+    if (imgRef.current?.complete) onImageLoad?.()
+  }, [])
   const snippet = photo.hasText
     ? photo.bodyPlain.slice(0, 60).trim() + (photo.bodyPlain.length > 60 ? '…' : '')
     : null
@@ -74,11 +80,12 @@ const PolaroidCard = memo(function PolaroidCard({ photo, onClick }) {
 
         <div className="polaroid-photo-wrap">
           <img
+            ref={imgRef}
             src={photo.dropbox}
             alt={photo.title || 'Street photo'}
             className="polaroid-photo"
-            loading="lazy"
             draggable="false"
+            onLoad={onImageLoad}
           />
           <Logo className="polaroid-stamp" />
         </div>
