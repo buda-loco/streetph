@@ -1,20 +1,21 @@
-const SOCIALS = [
-  { label: 'Instagram', handle: '@benarnedo',      href: 'https://instagram.com/benarnedo' },
-  { label: 'LinkedIn',  handle: 'benjaminarnedo',  href: 'https://www.linkedin.com/in/benjaminarnedo/' },
-]
+import contactData from '../content/contact.json'
 
 export default function Contact() {
+  const { email, instagram, linkedin } = contactData
   return (
     <section className="inner-page">
       <div className="inner-page-content">
         <p className="page-label">Contact</p>
 
-        <a href="mailto:hello@benjaminarnedo.com" className="contact-email">
-          hello@benjaminarnedo.com
+        <a href={`mailto:${email}`} className="contact-email">
+          {email}
         </a>
 
         <div className="contact-socials">
-          {SOCIALS.map(s => (
+          {[
+            { label: 'Instagram', handle: instagram.handle, href: instagram.url },
+            { label: 'LinkedIn',  handle: linkedin.handle,  href: linkedin.url  },
+          ].map(s => (
             <a key={s.label} href={s.href}
                target="_blank" rel="noopener noreferrer"
                className="contact-social-row">
