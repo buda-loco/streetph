@@ -113,7 +113,7 @@ export default function Drawer({ photos, open, onClose, onPhotoClick, tags, acti
                 key={photo.id}
                 className="masonry-item"
                 style={{ '--delay': `${0.05 + i * 0.06}s` }}
-                onClick={() => { onPhotoClick(photo); onClose() }}
+                onClick={() => onPhotoClick(photo)}
               >
                 <img src={photo.dropbox} alt={photo.title || ''} loading="lazy" draggable="false" />
                 {photo.title && <span className="masonry-caption">{photo.title}</span>}
