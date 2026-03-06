@@ -794,7 +794,7 @@ main { flex: 1; overflow: hidden; }
 .bio-sentence {
   display: inline;
   font-family: var(--font-hand);
-  font-size: 11.5px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 0.95;
   color: #2a2010;
@@ -841,7 +841,7 @@ main { flex: 1; overflow: hidden; }
 /* Mobile — narrower note */
 @media (max-width: 600px) {
   .bio-note { width: calc(100vw - 24px); }
-  .bio-sentence { font-size: 10px; line-height: 1.55; }
+  .bio-sentence { font-size: 13px; line-height: 1.55; }
 }
 
 /* ─── Lightbox logo stamp ────────────────────────────────── */
