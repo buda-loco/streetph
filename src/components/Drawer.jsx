@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import Logo from './Logo'
 
 function toCols(photos, n) {
   const cols = Array.from({ length: n }, () => [])
@@ -10,6 +11,7 @@ export default function Drawer({ photos, open, onClose, onPhotoClick, tags, acti
   const scrollRef = useRef(null)
   const colRefs   = useRef([])
   const [epoch, setEpoch] = useState(0)
+  const [loadedIds, setLoadedIds] = useState(new Set())
 
   useEffect(() => {
     if (open) setEpoch(e => e + 1)
@@ -33,6 +35,9 @@ export default function Drawer({ photos, open, onClose, onPhotoClick, tags, acti
   useEffect(() => {
     if (open && scrollRef.current) scrollRef.current.scrollTop = 0
   }, [open])
+
+  // Reset loaded state when filter changes so skeletons re-appear
+  useEffect(() => { setLoadedIds(new Set()) }, [activeTag])
 
   // Filtered photos for mobile (all photos filtered by tag)
   const mobilePhotos = activeTag
@@ -106,19 +111,36 @@ export default function Drawer({ photos, open, onClose, onPhotoClick, tags, acti
             ))}
           </div>
 
-          {/* Mobile: single column with staggered CSS animation */}
+          {/* Mobile: single column with staggered CSS animation + skeleton loading */}
           <div key={`m-${activeTag}`} className="masonry-grid masonry-grid--mobile">
-            {mobilePhotos.map((photo, i) => (
-              <button
-                key={photo.id}
-                className="masonry-item"
-                style={{ '--delay': `${0.05 + i * 0.06}s` }}
-                onClick={() => onPhotoClick(photo)}
-              >
-                <img src={photo.dropbox} alt={photo.title || ''} loading="eager" draggable="false" />
-                {photo.title && <span className="masonry-caption">{photo.title}</span>}
-              </button>
-            ))}
+            {mobilePhotos.map((photo, i) => {
+              const loaded = loadedIds.has(photo.id)
+              return (
+                <button
+                  key={photo.id}
+                  className={`masonry-item${loaded ? '' : ' masonry-item--pending'}`}
+                  style={{ '--delay': `${0.05 + i * 0.06}s` }}
+                  onClick={() => onPhotoClick(photo)}
+                >
+                  <div className="masonry-img-wrap">
+                    {!loaded && (
+                      <div className="masonry-skeleton">
+                        <Logo className="masonry-skeleton-logo" />
+                      </div>
+                    )}
+                    <img
+                      src={photo.dropbox}
+                      alt={photo.title || ''}
+                      loading="eager"
+                      draggable="false"
+                      className={loaded ? 'masonry-photo--loaded' : 'masonry-photo'}
+                      onLoad={() => setLoadedIds(prev => new Set([...prev, photo.id]))}
+                    />
+                  </div>
+                  {photo.title && <span className="masonry-caption">{photo.title}</span>}
+                </button>
+              )
+            })}
           </div>
 
           {/* Social links — mobile only, inline at bottom of gallery */}
