@@ -424,6 +424,9 @@ main { flex: 1; overflow: hidden; }
 }
 @keyframes lbIn { from { opacity: 0 } to { opacity: 1 } }
 
+/* Desktop: lb-scroll is a transparent pass-through wrapper */
+.lb-scroll { display: contents; }
+
 .lb-shell {
   position: relative;
   display: flex;
@@ -619,9 +622,16 @@ main { flex: 1; overflow: hidden; }
   .polaroid { width: 155px; padding: 8px 8px 36px; }
   .polaroid-photo-wrap { height: 150px; }
   .sticky-note { width: 76px; font-size: 10px; top: -14px; right: -10px; }
-  /* Lightbox — scrollable column: shell scrolls (not overlay — avoids iOS fixed+overflow bug) */
-  .lb-overlay { align-items: flex-start; }
-  .lb-shell { flex-direction: column; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  /* Lightbox — iOS-safe scroll: position:absolute container inside fixed overlay */
+  .lb-overlay { align-items: flex-start; overflow: hidden; }
+  .lb-scroll {
+    position: absolute;
+    inset: 0;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+  .lb-shell { flex-direction: column; height: auto; min-height: 100%; overflow: visible; }
   .lb-media { padding: 3.5rem 1rem 1rem; flex: none; height: auto; overflow: visible; }
   .lb-image { max-height: none; width: 100%; }
   .lb-details { width: 100%; border-left: none; border-top: 1px solid var(--border); padding: 1.5rem 1.25rem 2.5rem; flex: none; overflow-y: visible; }
@@ -685,6 +695,13 @@ main { flex: 1; overflow: hidden; }
   .gallery-page--blurred #table-canvas,
   .gallery-page--blurred .scatter-table,
   .gallery-page--blurred .gallery-controls { filter: none !important; }
+
+  /* Inner pages (About / Contact) — nav is fixed on mobile so page fills full viewport,
+     padding-top clears the fixed nav bar */
+  .inner-page {
+    height: 100dvh !important;
+    padding-top: calc(var(--nav-h) + 2rem) !important;
+  }
 }
 
 /* ─── Lightbox: no zoom on touch ────────────────────────── */

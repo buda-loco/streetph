@@ -72,12 +72,6 @@ const PolaroidCard = memo(function PolaroidCard({ photo, onClick, onImageLoad })
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
-        {snippet && (
-          <div className="sticky-note" style={{ background: stickyColor, ...stickyCfg }}>
-            <span className="sticky-text">{snippet}</span>
-          </div>
-        )}
-
         <div className="polaroid-photo-wrap">
           <img
             ref={imgRef}
@@ -101,6 +95,13 @@ const PolaroidCard = memo(function PolaroidCard({ photo, onClick, onImageLoad })
           className="polaroid-frame"
           draggable="false"
         />
+
+        {/* Sticky note — rendered after frame so it's above it in paint order (preserve-3d ignores z-index) */}
+        {snippet && (
+          <div className="sticky-note" style={{ background: stickyColor, ...stickyCfg }}>
+            <span className="sticky-text">{snippet}</span>
+          </div>
+        )}
       </div>
     </div>
   )

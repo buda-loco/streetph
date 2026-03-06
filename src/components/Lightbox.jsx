@@ -121,8 +121,12 @@ export default function Lightbox({ photo, photos, onClose, onNav }) {
       ref={overlayRef}
       onClick={e => e.target === overlayRef.current && onClose()}
     >
+      {/* Close button lives outside the scroll container so it's always fixed in view */}
+      <button className="lb-close" onClick={onClose} aria-label="Close">✕</button>
+
+      {/* lb-scroll: position:absolute inside fixed overlay — the iOS-safe scroll pattern */}
+      <div className="lb-scroll">
       <div className="lb-shell">
-        <button className="lb-close" onClick={onClose} aria-label="Close">✕</button>
 
         <button className="lb-nav lb-prev" onClick={goPrev} aria-label="Previous">
           <span>←</span>
@@ -187,6 +191,7 @@ export default function Lightbox({ photo, photos, onClose, onNav }) {
           <span>→</span>
         </button>
       </div>
+      </div>{/* end lb-scroll */}
     </div>
   )
 }
