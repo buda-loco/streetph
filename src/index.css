@@ -695,7 +695,7 @@ main { flex: 1; overflow: hidden; }
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    padding: 10px 0;
+    padding: 0;
     flex-shrink: 0;
     border-bottom: 1px solid var(--border);
     overscroll-behavior-x: contain;
@@ -711,6 +711,11 @@ main { flex: 1; overflow: hidden; }
     align-items: center;
     font-size: 0.68rem;
   }
+}
+
+/* ─── Hide steam canvas on mobile ──────────────────────── */
+@media (max-width: 600px) {
+  .steam-canvas { display: none !important; }
 }
 
 /* ─── Mobile fixed social bottom bar ────────────────────── */

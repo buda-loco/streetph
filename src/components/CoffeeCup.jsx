@@ -239,6 +239,7 @@ export default function CoffeeCup() {
       {createPortal(
         <canvas
           ref={steamRef}
+          className="steam-canvas"
           style={{
             position:      'fixed',
             left:          steamLeft,
