@@ -9,7 +9,8 @@ export function toDirectUrl(url) {
   try {
     const u = new URL(url)
     if (u.hostname === 'www.dropbox.com' || u.hostname === 'dropbox.com') {
-      u.hostname = 'dl.dropboxusercontent.com'
+      // Keep www.dropbox.com hostname — dl.dropboxusercontent.com returns application/json
+      // for new /scl/fi/ URLs. www.dropbox.com + raw=1 returns a 302 to the actual CDN image.
       u.searchParams.set('raw', '1')
       u.searchParams.delete('dl')
     }

@@ -637,7 +637,7 @@ main { flex: 1; overflow: hidden; }
     left: 0 !important;
     right: 0 !important;
     top: var(--nav-h) !important;
-    height: calc(100dvh - var(--nav-h) - 52px) !important;
+    height: calc(100dvh - var(--nav-h)) !important;
     transform: none !important;
     border-left: none !important;
     border-top: 1px solid var(--border) !important;
@@ -669,7 +669,7 @@ main { flex: 1; overflow: hidden; }
     max-width: calc(100vw - 48px) !important;
     border-radius: 12px !important;
     padding: 16px 18px !important;
-    bottom: 68px !important;
+    bottom: 24px !important;
   }
   .music-toast-icon { color: rgba(255,255,255,0.4) !important; font-size: 0.95rem !important; }
   .music-toast-body { gap: 10px !important; align-items: flex-start !important; }
@@ -718,23 +718,17 @@ main { flex: 1; overflow: hidden; }
   .steam-canvas { display: none !important; }
 }
 
-/* ─── Mobile fixed social bottom bar ────────────────────── */
+/* ─── Mobile social bar — inline at bottom of drawer scroll ── */
 .mobile-social-bar { display: none; }
 @media (max-width: 600px) {
   .mobile-social-bar {
     display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 52px;
     align-items: center;
     justify-content: center;
     gap: 3rem;
-    background: rgba(5,5,5,0.95);
-    backdrop-filter: blur(12px);
+    padding: 24px 0 32px;
     border-top: 1px solid rgba(160,160,160,0.1);
-    z-index: 2500;
+    margin-top: 16px;
   }
   .mobile-social-bar a {
     display: flex;

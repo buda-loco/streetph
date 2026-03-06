@@ -121,6 +121,16 @@ export default function Drawer({ photos, open, onClose, onPhotoClick, tags, acti
             ))}
           </div>
 
+          {/* Social links — mobile only, inline at bottom of gallery */}
+          <div className="mobile-social-bar">
+            <a href="https://instagram.com/benarnedo" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <i className="lni lni-instagram-original" />
+            </a>
+            <a href="https://www.linkedin.com/in/benjaminarnedo/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+              <i className="lni lni-linkedin-original" />
+            </a>
+          </div>
+
         </div>
       </div>
     </>

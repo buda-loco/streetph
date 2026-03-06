@@ -22,15 +22,6 @@ export default function Nav() {
         </div>
       </header>
 
-      {/* Fixed bottom social bar — mobile only */}
-      <div className="mobile-social-bar">
-        <a href="https://instagram.com/benarnedo" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-          <i className="lni lni-instagram-original" />
-        </a>
-        <a href="https://www.linkedin.com/in/benjaminarnedo/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-          <i className="lni lni-linkedin-original" />
-        </a>
-      </div>
     </>
   )
 }
