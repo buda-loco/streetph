@@ -618,10 +618,12 @@ main { flex: 1; overflow: hidden; }
   .polaroid { width: 155px; padding: 8px 8px 36px; }
   .polaroid-photo-wrap { height: 150px; }
   .sticky-note { width: 76px; font-size: 10px; top: -14px; right: -10px; }
-  .lb-shell { flex-direction: column; }
-  .lb-media { padding: 4rem 1rem 1rem; flex: none; height: 55vh; }
-  .lb-image { max-height: 55vh; }
-  .lb-details { width: 100%; border-left: none; border-top: 1px solid var(--border); padding: 1.5rem 1.25rem; flex: 1; }
+  /* Lightbox — scrollable column: image then description */
+  .lb-overlay { overflow-y: auto; align-items: flex-start; }
+  .lb-shell { flex-direction: column; height: auto; min-height: 100%; }
+  .lb-media { padding: 3.5rem 1rem 1rem; flex: none; height: auto; overflow: visible; }
+  .lb-image { max-height: none; width: 100%; }
+  .lb-details { width: 100%; border-left: none; border-top: 1px solid var(--border); padding: 1.5rem 1.25rem 2.5rem; flex: none; }
   .lb-nav { display: none; }
   .coffee-scene { display: none; }
 
@@ -695,7 +697,7 @@ main { flex: 1; overflow: hidden; }
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    padding: 0;
+    padding: 6px 0;
     flex-shrink: 0;
     border-bottom: 1px solid var(--border);
     overscroll-behavior-x: contain;
@@ -705,8 +707,7 @@ main { flex: 1; overflow: hidden; }
   .drawer-filter-strip::-webkit-scrollbar { display: none; }
   .drawer-filter-strip .filter-btn {
     flex-shrink: 0;
-    min-height: 36px;
-    padding: 0 14px;
+    padding: 8px 16px;
     display: flex;
     align-items: center;
     font-size: 0.68rem;
@@ -726,7 +727,7 @@ main { flex: 1; overflow: hidden; }
     align-items: center;
     justify-content: center;
     gap: 3rem;
-    padding: 24px 0 32px;
+    padding: 24px 0 calc(28px + env(safe-area-inset-bottom, 0px));
     border-top: 1px solid rgba(160,160,160,0.1);
     margin-top: 16px;
   }
