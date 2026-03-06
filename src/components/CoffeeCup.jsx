@@ -28,7 +28,7 @@ export default function CoffeeCup() {
     //   Alpha curve: fade-in first 15%, hold to 60%, fade-out last 40%
     //   Peak alpha: 0.08–0.14 — very translucent (hot vapor, not smoke)
     const spawn = () => {
-      const spawnR  = 4 + Math.random() * 4
+      const spawnR  = 6 + Math.random() * 6
       const maxAge  = 150 + Math.random() * 120
       return {
         x:         cx + (Math.random() - 0.5) * pos.coffee.width * 0.24,
@@ -39,7 +39,7 @@ export default function CoffeeCup() {
         r:         spawnR,
         age:       0,
         maxAge,
-        peakAlpha: 0.08 + Math.random() * 0.06,
+        peakAlpha: 0.18 + Math.random() * 0.10,
         wave:      Math.random() * Math.PI * 2,
         waveFreq:  0.25 + Math.random() * 0.20,
         waveAmp:   0.50 + Math.random() * 0.70,
@@ -62,7 +62,7 @@ export default function CoffeeCup() {
     let nextBubble  = 60 + Math.random() * 120
 
     // Seed initial particles spread across the canvas height
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 18; i++) {
       const p = spawn()
       p.y    -= Math.random() * H * 0.88
       // Give them a random age proportional to how far they've already risen
@@ -80,7 +80,7 @@ export default function CoffeeCup() {
       ctx.globalCompositeOperation = 'lighter'
 
       // Spawn ~3-4 new particles per second at 60fps (0.06/frame)
-      if (Math.random() < 0.06) particles.push(spawn())
+      if (Math.random() < 0.10) particles.push(spawn())
 
       // Bubble timer
       nextBubble--
