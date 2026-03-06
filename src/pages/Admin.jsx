@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { listFiles, fetchFile, saveFile, deleteFile, testConnection } from '../lib/github.js'
+import { toDirectUrl } from '../lib/photos.js'
 
 // ─── Auth helpers ──────────────────────────────────────────────────────────────
 
@@ -176,6 +177,7 @@ function Login({ onDone }) {
 
 function PhotosTab() {
   const [list,    setList]    = useState(null)
+  const [thumbs,  setThumbs]  = useState({})
   const [editing, setEditing] = useState(null)
   const [msg,     setMsg]     = useState({})
   const [busy,    setBusy]    = useState(false)
@@ -184,11 +186,20 @@ function PhotosTab() {
     setMsg({})
     try {
       const files = await listFiles('photos')
-      setList(
-        files
-          .filter(f => f.name.endsWith('.md') && f.name !== '_template.md')
-          .sort((a, b) => b.name.localeCompare(a.name))
-      )
+      const photoFiles = files
+        .filter(f => f.name.endsWith('.md') && f.name !== '_template.md')
+        .sort((a, b) => b.name.localeCompare(a.name))
+      setList(photoFiles)
+
+      // Load thumbnails in parallel via public download_url (no extra auth calls)
+      photoFiles.forEach(async (file) => {
+        try {
+          const res = await fetch(file.download_url)
+          const raw = await res.text()
+          const thumb = toDirectUrl(parseMd(raw).dropbox)
+          if (thumb) setThumbs(prev => ({ ...prev, [file.path]: thumb }))
+        } catch {}
+      })
     } catch (e) { setMsg({ err: e.message }) }
   }, [])
 
@@ -255,6 +266,9 @@ function PhotosTab() {
         <div className="adm-list">
           {list.map(file => (
             <div key={file.sha} className="adm-list-row">
+              <div className="adm-thumb">
+                {thumbs[file.path] && <img src={thumbs[file.path]} alt="" />}
+              </div>
               <code className="adm-filename">{file.name}</code>
               <div className="adm-list-actions">
                 <button className="adm-btn adm-btn--sm" onClick={() => openEdit(file)} disabled={busy}>Edit</button>
@@ -307,6 +321,11 @@ function PhotoEditor({ editing, onSave, onCancel, busy, msg }) {
       <Field label="Tags (comma-separated)" value={fields.tags} onChange={upd('tags')} note='e.g. street, night, color' />
       <Field label="Dropbox photo URL" value={fields.dropbox} onChange={upd('dropbox')}
         note="Paste the share link — it will be auto-converted to a direct URL at build time" />
+      {fields.dropbox && (
+        <div className="adm-preview">
+          <img src={toDirectUrl(fields.dropbox)} alt="Preview" className="adm-preview-img" />
+        </div>
+      )}
 
       <div className="adm-grid-2">
         <Field label="Video URL (optional)" value={fields.video} onChange={upd('video')} />

@@ -1312,6 +1312,33 @@ main { flex: 1; overflow: hidden; }
 .adm-section--info  { opacity: 0.7; }
 .adm-section-title  { font-size: 0.83rem; font-weight: 600; color: #888; letter-spacing: 0.04em; text-transform: uppercase; margin: 0; }
 
+/* Thumbnails */
+.adm-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 5px;
+  background: #111;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.adm-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Editor preview */
+.adm-preview { margin-bottom: 0.9rem; }
+.adm-preview-img {
+  max-height: 220px;
+  max-width: 100%;
+  border-radius: 6px;
+  object-fit: contain;
+  background: #111;
+  display: block;
+}
+
 /* GitHub Actions snippet */
 .adm-pre {
   background: #0a0a0a;
