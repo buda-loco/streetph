@@ -348,8 +348,8 @@ main { flex: 1; overflow: hidden; }
   left: 13px; right: 13px;
   text-align: center;
   font-family: var(--font-hand);
-  font-size: 14px;
-  font-weight: 400;
+  font-size: 11px;
+  font-weight: 700;
   color: #555;
   z-index: 4;
   line-height: 1.3;

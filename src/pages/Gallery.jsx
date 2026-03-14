@@ -16,11 +16,12 @@ import { CUP_TARGET } from '../lib/tableLayout.js'
 const BATCH = 9
 
 // Zones keep cards spread but overlapping looks natural — like a real table
-const X_ZONES = [[8, 34], [30, 58], [54, 86]]
-const Y_ZONES = [[35, 48], [40, 67], [60, 88]]
+// Right/bottom zones capped to keep cards clear of the coffee cup plate area
+const X_ZONES = [[8, 34], [30, 58], [54, 76]]
+const Y_ZONES = [[30, 45], [40, 62], [55, 78]]
 
 // Exclusion zone derived from where the cup actually sits (% of scatter-table)
-const CUP_EXCLUSION = { cx: CUP_TARGET.x * 100, cy: CUP_TARGET.y * 100, r: 18 }
+const CUP_EXCLUSION = { cx: CUP_TARGET.x * 100, cy: CUP_TARGET.y * 100, r: 26 }
 
 // ── Helpers ──────────────────────────────────────────────────────────
 function seededRng(seed) {
@@ -299,8 +300,20 @@ export default function Gallery({ photos, onAssetLoaded, ready }) {
       const matches = !activeTag || photo.tags.includes(activeTag)
 
       if (matches) {
+        // When a filter is active, pull cards toward the table centre so they're easier to see.
+        // When filter is cleared (activeTag null) cards return to x:0 y:0 (their scatter position).
+        let tx = 0, ty = 0
+        if (activeTag) {
+          const table = el.closest('.scatter-table')
+          const tW = table?.offsetWidth  || window.innerWidth
+          const tH = table?.offsetHeight || window.innerHeight
+          const baseX = (layout[i].x / 100) * tW
+          const baseY = (layout[i].y / 100) * tH
+          tx = (tW * 0.5 - baseX) * 0.55
+          ty = (tH * 0.5 - baseY) * 0.55
+        }
         gsap.to(el, {
-          x: 0, y: 0, rotation, opacity: 1, zIndex,
+          x: tx, y: ty, rotation, opacity: 1, zIndex,
           duration: 0.55, ease: 'back.out(1.4)',
           delay: 0.08 + i * 0.03,
           onStart: () => { el.style.pointerEvents = '' },
