@@ -3,21 +3,12 @@ import { marked } from 'marked'
 // Load all markdown files from /photos/ as raw strings
 const rawFiles = import.meta.glob('../../photos/*.md', { eager: true, query: '?raw', import: 'default' })
 
-// Converts a Dropbox share link to a direct-load image URL
-export function toDirectUrl(url) {
+// Injects Cloudinary auto-optimization transforms into a Cloudinary URL.
+// Non-Cloudinary URLs are returned unchanged (backward compat for any legacy links).
+export function toCloudinaryUrl(url) {
   if (!url) return url
-  try {
-    const u = new URL(url)
-    if (u.hostname === 'www.dropbox.com' || u.hostname === 'dropbox.com') {
-      // Keep www.dropbox.com hostname — dl.dropboxusercontent.com returns application/json
-      // for new /scl/fi/ URLs. www.dropbox.com + raw=1 returns a 302 to the actual CDN image.
-      u.searchParams.set('raw', '1')
-      u.searchParams.delete('dl')
-    }
-    return u.toString()
-  } catch {
-    return url
-  }
+  if (!url.includes('cloudinary.com')) return url
+  return url.replace('/upload/', '/upload/w_1600,f_auto,q_auto/')
 }
 
 // Minimal YAML-like frontmatter parser (avoids gray-matter browser issues)
@@ -90,7 +81,7 @@ export function loadPhotos() {
         date: data.date || null,
         location: data.location || '',
         tags: Array.isArray(data.tags) ? data.tags : [],
-        dropbox: data.dropbox ? toDirectUrl(data.dropbox) : null,
+        image: data.image ? toCloudinaryUrl(data.image) : null,
         video: data.video || null,
         videoPoster: data.videoPoster || null,
         videoLoop: data.videoLoop || false,
@@ -103,7 +94,7 @@ export function loadPhotos() {
         tiltY: (rng() - 0.5) * 30,
       }
     })
-    .filter(p => p.dropbox || p.video)
+    .filter(p => p.image || p.video)
     .sort((a, b) => {
       if (!a.date && !b.date) return 0
       if (!a.date) return 1

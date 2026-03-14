@@ -9,6 +9,7 @@ content:
     path: photos
     view:
       fields: [title, date, location, tags]
+      preview: image
     fields:
       - name: title
         label: Title
@@ -24,11 +25,10 @@ content:
         label: Tags
         type: string
         list: true
-      - name: dropbox
-        label: Dropbox photo URL
-        type: string
+      - name: image
+        label: Photo
+        type: image
         required: true
-        description: "Paste the Dropbox share link — it will be auto-converted to a direct URL at build time"
       - name: video
         label: Video URL (optional)
         type: string

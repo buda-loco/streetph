@@ -3,7 +3,7 @@ title: "Photo title"
 date: 2026-01-01
 location: "Buenos Aires"
 tags: ["street", "night"]
-dropbox: "https://www.dropbox.com/scl/fi/YOURFILEID/photo.jpg?rlkey=YOURKEY&dl=0"
+image: "https://res.cloudinary.com/YOUR_CLOUD_NAME/image/upload/YOUR_PUBLIC_ID.jpg"
 # Optional video (ONELINEPLAYER — paste raw Dropbox share link, no transformation needed):
 # video: "https://www.dropbox.com/scl/fi/YOURFILEID/video.mp4?rlkey=YOURKEY&dl=0"
 # videoPoster: "https://www.dropbox.com/scl/fi/YOURFILEID/poster.jpg?rlkey=YOURKEY&dl=0"

@@ -75,7 +75,7 @@ const PolaroidCard = memo(function PolaroidCard({ photo, onClick, onImageLoad })
         <div className="polaroid-photo-wrap">
           <img
             ref={imgRef}
-            src={photo.dropbox}
+            src={photo.image}
             alt={photo.title || 'Street photo'}
             className="polaroid-photo"
             draggable="false"

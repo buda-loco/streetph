@@ -147,7 +147,7 @@ export default function Lightbox({ photo, photos, onClose, onNav }) {
             <img
               key={photo.id}
               ref={imgRef}
-              src={photo.dropbox}
+              src={photo.image}
               alt={photo.title || 'Street photo'}
               className={`lb-image ${zoomed ? 'lb-image--zoomed' : ''}`}
               onClick={handleImageClick}
