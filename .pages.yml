@@ -8,7 +8,7 @@ content:
     type: collection
     path: photos
     view:
-      fields: [title, date, location, tags]
+      fields: [image, title, date, location, tags]
       preview: image
     fields:
       - name: title

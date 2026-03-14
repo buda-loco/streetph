@@ -3,12 +3,23 @@ import { marked } from 'marked'
 // Load all markdown files from /photos/ as raw strings
 const rawFiles = import.meta.glob('../../photos/*.md', { eager: true, query: '?raw', import: 'default' })
 
-// Injects Cloudinary auto-optimization transforms into a Cloudinary URL.
-// Non-Cloudinary URLs are returned unchanged (backward compat for any legacy links).
+// Prepares an image URL for direct loading:
+// - Cloudinary: injects auto-optimization transforms (w_1600,f_auto,q_auto)
+// - Dropbox: adds ?raw=1 so it serves the image directly instead of a preview page
 export function toCloudinaryUrl(url) {
   if (!url) return url
-  if (!url.includes('cloudinary.com')) return url
-  return url.replace('/upload/', '/upload/w_1600,f_auto,q_auto/')
+  if (url.includes('cloudinary.com')) {
+    return url.replace('/upload/', '/upload/w_1600,f_auto,q_auto/')
+  }
+  try {
+    const u = new URL(url)
+    if (u.hostname === 'www.dropbox.com' || u.hostname === 'dropbox.com') {
+      u.searchParams.set('raw', '1')
+      u.searchParams.delete('dl')
+      return u.toString()
+    }
+  } catch { /* invalid URL — return as-is */ }
+  return url
 }
 
 // Minimal YAML-like frontmatter parser (avoids gray-matter browser issues)

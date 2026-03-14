@@ -35,8 +35,9 @@ function seededRng(seed) {
 
 function makeBatch(photos, seed) {
   if (!photos.length) return []
+  const count = Math.min(BATCH, photos.length)
   const rng = seededRng(seed * 4049 + 7)
-  const rest = Array.from({ length: BATCH - 1 }, () =>
+  const rest = Array.from({ length: count - 1 }, () =>
     photos[Math.floor(rng() * photos.length)]
   )
   return [photos[0], ...rest]   // latest always first
