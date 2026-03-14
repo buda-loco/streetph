@@ -300,20 +300,22 @@ export default function Gallery({ photos, onAssetLoaded, ready }) {
       const matches = !activeTag || photo.tags.includes(activeTag)
 
       if (matches) {
-        // When a filter is active, pull cards toward the table centre so they're easier to see.
-        // When filter is cleared (activeTag null) cards return to x:0 y:0 (their scatter position).
-        let tx = 0, ty = 0
+        // No filter → return each card to its scatter position
+        // Filter active → pile all matching cards in the centre with slight jitter
+        let tx = 0, ty = 0, rot = rotation
         if (activeTag) {
           const table = el.closest('.scatter-table')
           const tW = table?.offsetWidth  || window.innerWidth
           const tH = table?.offsetHeight || window.innerHeight
           const baseX = (layout[i].x / 100) * tW
           const baseY = (layout[i].y / 100) * tH
-          tx = (tW * 0.5 - baseX) * 0.55
-          ty = (tH * 0.5 - baseY) * 0.55
+          // All cards converge on table centre + small random offset for a natural pile
+          tx = (tW * 0.5 - baseX) + (Math.random() - 0.5) * 50
+          ty = (tH * 0.5 - baseY) + (Math.random() - 0.5) * 50
+          rot = (Math.random() - 0.5) * 28
         }
         gsap.to(el, {
-          x: tx, y: ty, rotation, opacity: 1, zIndex,
+          x: tx, y: ty, rotation: rot, opacity: 1, zIndex,
           duration: 0.55, ease: 'back.out(1.4)',
           delay: 0.08 + i * 0.03,
           onStart: () => { el.style.pointerEvents = '' },
