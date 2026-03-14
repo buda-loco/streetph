@@ -323,16 +323,21 @@ export default function Gallery({ photos, onAssetLoaded, ready }) {
           onStart: () => { el.style.pointerEvents = '' },
         })
       } else {
-        const angle = Math.random() * Math.PI * 2
-        const dist  = 700 + Math.random() * 600
+        // Non-matching: also drift to centre but fade out so everything gathers inward
+        const table = el.closest('.scatter-table')
+        const tW = table?.offsetWidth  || window.innerWidth
+        const tH = table?.offsetHeight || window.innerHeight
+        const baseX = (layout[i].x / 100) * tW
+        const baseY = (layout[i].y / 100) * tH
+        const tx = (tW * 0.5 - baseX) + (Math.random() - 0.5) * 80
+        const ty = (tH * 0.5 - baseY) + (Math.random() - 0.5) * 80
         gsap.to(el, {
-          x: Math.cos(angle) * dist,
-          y: Math.sin(angle) * dist - 100,
-          rotation: (Math.random() - 0.5) * 400,
+          x: tx, y: ty,
+          rotation: (Math.random() - 0.5) * 30,
           opacity: 0,
-          duration: 0.38 + Math.random() * 0.22,
-          ease: 'power3.in',
-          delay: Math.random() * 0.14,
+          duration: 0.45,
+          ease: 'power2.in',
+          delay: Math.random() * 0.1,
           onStart: () => { el.style.pointerEvents = 'none' },
         })
       }
