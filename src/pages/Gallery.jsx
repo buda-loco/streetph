@@ -91,7 +91,27 @@ function computeScatter(count, seed, exclusion = null) {
 }
 
 // ── Component ─────────────────────────────────────────────────────────
-export default function Gallery({ photos }) {
+//
+// Asset loading coordination:
+//
+//   image loads (9×)           wood.png (1×)
+//        │                          │
+//        ▼                          ▼
+//   onCardLoaded(i)      TableScene({ onReady: onAssetLoaded })
+//        │
+//   loadedSetRef guards against double-count (cached img fires both
+//   useEffect+onLoad paths in PolaroidCard)
+//        │
+//   onAssetLoaded() → App loadedCount++ → Preloader counter
+//        │
+//   if !ready: leave in pendingAnimRef (GSAP deferred)
+//   if  ready: fire GSAP immediately
+//
+//   readyRef lets onCardLoaded read current `ready` without making
+//   it a useCallback dependency — prevents re-rendering all 9 memoized
+//   PolaroidCards when the preloader fades.
+//
+export default function Gallery({ photos, onAssetLoaded, ready }) {
   const canvasRef      = useRef(null)
   const cardRefs       = useRef([])
   const shadowRafRef   = useRef(null)
@@ -99,6 +119,8 @@ export default function Gallery({ photos }) {
   const lightTarget    = useRef({ ...lightMouse.current })
   const topZRef        = useRef(30)
   const pendingAnimRef = useRef({})   // i → { el, delay } — triggered on image load
+  const readyRef       = useRef(ready)   // read in onCardLoaded without re-creating it
+  const loadedSetRef   = useRef(new Set()) // dedup: prevent double-counting cached imgs
 
   const [activeTag,     setActiveTag]     = useState(null)
   const [shuffleKey,    setShuffleKey]    = useState(0)
@@ -122,13 +144,25 @@ export default function Gallery({ photos }) {
     [batch, activeTag]
   )
 
+  // Keep readyRef in sync so onCardLoaded can read it without being a dep
+  useEffect(() => { readyRef.current = ready }, [ready])
+
+  // When preloader fades and ready flips true, fire all deferred card animations
+  useEffect(() => {
+    if (!ready) return
+    Object.entries(pendingAnimRef.current).forEach(([iStr, { el, delay }]) => {
+      delete pendingAnimRef.current[parseInt(iStr)]
+      gsap.to(el, { y: 0, opacity: 1, duration: 0.75, ease: 'back.out(1.6)', delay })
+    })
+  }, [ready])
+
   // ── Three.js wood table ──────────────────────────────────────────────
   useEffect(() => {
     if (!canvasRef.current) return
-    const scene = new TableScene(canvasRef.current)
+    const scene = new TableScene(canvasRef.current, { onReady: onAssetLoaded })
     scene.start()
     return () => scene.stop()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Light-reactive shadow RAF ────────────────────────────────────────
   useEffect(() => {
@@ -204,6 +238,7 @@ export default function Gallery({ photos }) {
   // ── Fall-in on batch change — triggered per-card on image load ──────
   useEffect(() => {
     pendingAnimRef.current = {}
+    loadedSetRef.current   = new Set()
     const sleeperIdx = batch.length - 1
     cardRefs.current.forEach((el, i) => {
       if (!el) return
@@ -220,13 +255,22 @@ export default function Gallery({ photos }) {
     })
   }, [batch, layout])
 
-  // Called by PolaroidCard when its photo finishes loading (or is already cached)
+  // Called by PolaroidCard when its photo finishes loading (or errors/is cached).
+  // Uses readyRef (not `ready` prop) as dep to avoid re-creating this function —
+  // which would force all 9 memoized PolaroidCards to re-render on reveal.
   const onCardLoaded = useCallback((i) => {
+    // Deduplicate: PolaroidCard can fire onImageLoad via both the useEffect (cached
+    // path) and onLoad (network path). Only count each card index once.
+    if (!loadedSetRef.current.has(i)) {
+      loadedSetRef.current.add(i)
+      onAssetLoaded?.()
+    }
+
     const pending = pendingAnimRef.current[i]
     if (!pending) return
     const { el, delay } = pending
-    delete pendingAnimRef.current[i]
 
+    // Apply developing class now (plays behind preloader; photo is ready on reveal)
     const img = el.querySelector('.polaroid-photo')
     if (img) {
       img.classList.remove('developing')
@@ -234,13 +278,13 @@ export default function Gallery({ photos }) {
       img.classList.add('developing')
     }
 
-    gsap.to(el, {
-      y: 0, opacity: 1,
-      duration: 0.75,
-      ease: 'back.out(1.6)',
-      delay,
-    })
-  }, [])
+    if (readyRef.current) {
+      // Preloader already gone — animate immediately
+      delete pendingAnimRef.current[i]
+      gsap.to(el, { y: 0, opacity: 1, duration: 0.75, ease: 'back.out(1.6)', delay })
+    }
+    // else: leave in pendingAnimRef; ready useEffect fires all deferred animations
+  }, [onAssetLoaded])
 
   // ── Filter blow-away ────────────────────────────────────────────────
   useEffect(() => {
@@ -508,7 +552,7 @@ export default function Gallery({ photos }) {
         onDismissStart={() => setBioVisible(false)}
       />
 
-      <CoffeeCup />
+      <CoffeeCup onAssetLoaded={onAssetLoaded} />
 
       <DustParticles />
 

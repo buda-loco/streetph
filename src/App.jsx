@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Nav         from './components/Nav.jsx'
 import Footer      from './components/Footer.jsx'
 import Preloader   from './components/Preloader.jsx'
@@ -10,6 +10,10 @@ import Contact     from './pages/Contact.jsx'
 import { loadPhotos } from './lib/photos.js'
 
 const photos = loadPhotos()
+
+// Assets tracked by preloader: 9 batch photos + wood.png + coffee.png + coffeecup.png
+// If there are no photos, only the 3 non-photo assets are tracked.
+const TOTAL_ASSETS = (photos.length > 0 ? 9 : 0) + 3
 
 function useHash() {
   const [hash, setHash] = useState(window.location.hash || '#/')
@@ -24,7 +28,10 @@ function useHash() {
 export default function App() {
   const route        = useHash()
 
-  const [ready,      setReady]     = useState(false)
+  const [ready,       setReady]      = useState(false)
+  const [loadedCount, setLoadedCount] = useState(0)
+  const onAssetLoaded = useCallback(() => setLoadedCount(c => c + 1), [])
+
   const [showModal,  setShowModal] = useState(false)
   const miniPlayerRef = useRef(null)
   const prevRoute    = useRef(route)
@@ -47,7 +54,13 @@ export default function App() {
 
   return (
     <div className="app">
-      {!ready && <Preloader onDone={() => setReady(true)} />}
+      {!ready && (
+        <Preloader
+          loaded={loadedCount}
+          total={TOTAL_ASSETS}
+          onDone={() => setReady(true)}
+        />
+      )}
       <Nav />
       <MiniPlayer ref={miniPlayerRef} />
       {showModal && (
@@ -62,7 +75,7 @@ export default function App() {
         />
       )}
       <main key={pageKey} className="page-fade">
-        {route === '/'        && <Gallery photos={photos} />}
+        {route === '/'        && <Gallery photos={photos} onAssetLoaded={onAssetLoaded} ready={ready} />}
         {route === '/about'   && <About />}
         {route === '/contact' && <Contact />}
       </main>

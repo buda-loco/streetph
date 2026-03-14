@@ -2,9 +2,22 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { computeTableLayout, COFFEE_IN_CUP, CUP_TARGET, NAV_H } from '../lib/tableLayout.js'
 
-export default function CoffeeCup() {
+export default function CoffeeCup({ onAssetLoaded }) {
   const steamRef = useRef(null)
   const [pos, setPos] = useState(null)
+
+  // Preload cup images independently of render state.
+  // Uses new Image() to handle cached images correctly — the rendered <img> tags
+  // may not fire onLoad if the browser already has them cached.
+  // Each image (coffee.png + coffeecup.png) calls onAssetLoaded once on load OR error.
+  useEffect(() => {
+    const notify = () => onAssetLoaded?.()
+    for (const src of ['/table/coffee.png', '/table/coffeecup.png']) {
+      const img = new Image()
+      img.onload = img.onerror = notify
+      img.src = src
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const calc = () => setPos(computeTableLayout())

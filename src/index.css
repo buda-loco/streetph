@@ -62,6 +62,12 @@ body {
   height: 34px;
   color: var(--accent);
 }
+.preloader-count {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: rgba(160, 160, 160, 0.55);
+  font-variant-numeric: tabular-nums;
+}
 
 /* ─── Lineicons global size normalisation ────────────────── */
 [class^="lni-"], [class*=" lni-"] {

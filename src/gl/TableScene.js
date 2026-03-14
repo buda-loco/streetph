@@ -75,8 +75,9 @@ void main() {
 `
 
 export class TableScene {
-  constructor(canvas) {
+  constructor(canvas, { onReady } = {}) {
     this.canvas = canvas
+    this._onReady = onReady
     // Init in CSS pixels; _resize() will correct to physical once PR is known
     this._mouse = new Vector2(
       window.innerWidth * 0.5,
@@ -125,13 +126,21 @@ export class TableScene {
     this._targetMouse.copy(this._mouse)
 
     // Load real wood texture (served from /public/table/)
-    new TextureLoader().load('/table/wood.png', (tex) => {
-      tex.wrapS = tex.wrapT = ClampToEdgeWrapping
-      tex.minFilter = LinearFilter
-      tex.magFilter = LinearFilter
-      this.uniforms.uWood.value = tex
-      this._woodReady = true
-    })
+    // Error callback ensures onReady fires even on 404 — prevents preloader from
+    // blocking indefinitely when wood.png fails to load.
+    new TextureLoader().load(
+      '/table/wood.png',
+      (tex) => {
+        tex.wrapS = tex.wrapT = ClampToEdgeWrapping
+        tex.minFilter = LinearFilter
+        tex.magFilter = LinearFilter
+        this.uniforms.uWood.value = tex
+        this._woodReady = true
+        this._onReady?.()
+      },
+      undefined,
+      () => { this._onReady?.() }
+    )
   }
 
   _resize() {

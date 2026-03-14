@@ -80,6 +80,7 @@ const PolaroidCard = memo(function PolaroidCard({ photo, onClick, onImageLoad })
             className="polaroid-photo"
             draggable="false"
             onLoad={onImageLoad}
+            onError={onImageLoad}
           />
           <Logo className="polaroid-stamp" />
         </div>
