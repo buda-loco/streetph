@@ -1,0 +1,96 @@
+media:
+  input: public/media
+  output: /media
+
+content:
+  - name: photos
+    label: Photos
+    type: collection
+    path: photos
+    view:
+      fields: [title, date, location, tags]
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: date
+        label: Date
+        type: date
+      - name: location
+        label: Location
+        type: string
+      - name: tags
+        label: Tags
+        type: string
+        list: true
+      - name: dropbox
+        label: Dropbox photo URL
+        type: string
+        required: true
+        description: "Paste the Dropbox share link — it will be auto-converted to a direct URL at build time"
+      - name: video
+        label: Video URL (optional)
+        type: string
+      - name: videoPoster
+        label: Video poster URL (optional)
+        type: string
+      - name: videoLoop
+        label: Loop video
+        type: boolean
+        default: false
+      - name: featured
+        label: Featured
+        type: boolean
+        default: false
+      - name: body
+        label: Body text (appears as sticky note and in lightbox)
+        type: rich-text
+
+  - name: bio
+    label: Bio
+    type: file
+    path: src/content/bio.md
+    fields:
+      - name: body
+        label: Bio text (markdown links supported)
+        type: rich-text
+
+  - name: contact
+    label: Contact
+    type: file
+    path: src/content/contact.json
+    fields:
+      - name: email
+        label: Email
+        type: string
+      - name: instagram
+        label: Instagram
+        type: object
+        fields:
+          - name: handle
+            label: Handle (with @)
+            type: string
+          - name: url
+            label: URL
+            type: string
+      - name: linkedin
+        label: LinkedIn
+        type: object
+        fields:
+          - name: handle
+            label: Handle
+            type: string
+          - name: url
+            label: URL
+            type: string
+
+  - name: playlist
+    label: Music Playlist
+    type: file
+    path: src/content/playlist.json
+    fields:
+      - name: id
+        label: YouTube Playlist ID
+        type: string
+        description: "The ID from the YouTube playlist URL (the part after 'list=')"

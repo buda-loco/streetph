@@ -21,26 +21,48 @@ export function toDirectUrl(url) {
 }
 
 // Minimal YAML-like frontmatter parser (avoids gray-matter browser issues)
+// Handles both JSON-array syntax (tags: ["a","b"]) and YAML block sequences:
+//   tags:        tags: [a, b]
+//     - a
+//     - b
 function parseMd(raw) {
   const match = raw.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)/)
   if (!match) return { data: {}, content: raw.trim() }
 
   const data = {}
-  match[1].split('\n').forEach(line => {
-    if (line.startsWith('#') || !line.trim()) return
+  const lines = match[1].split('\n')
+  let i = 0
+  while (i < lines.length) {
+    const line = lines[i]
+    if (line.startsWith('#') || !line.trim()) { i++; continue }
     const col = line.indexOf(':')
-    if (col === -1) return
+    if (col === -1) { i++; continue }
     const key = line.slice(0, col).trim()
     const val = line.slice(col + 1).trim()
-    if (!key) return
-    if (val === 'true') data[key] = true
-    else if (val === 'false') data[key] = false
+    if (!key) { i++; continue }
+    if (val === 'true')       { data[key] = true; i++ }
+    else if (val === 'false') { data[key] = false; i++ }
     else if (val.startsWith('[')) {
-      try { data[key] = JSON.parse(val.replace(/'/g, '"')) } catch { data[key] = [] }
+      // JSON-array: ["a","b"]  or YAML flow sequence: [a, b]
+      try { data[key] = JSON.parse(val.replace(/'/g, '"')) } catch {
+        const inner = val.match(/^\[(.*)\]$/)
+        data[key] = inner ? inner[1].split(',').map(s => s.trim().replace(/^["']|["']$/g, '')).filter(Boolean) : []
+      }
+      i++
+    } else if (val === '') {
+      // YAML block sequence — collect subsequent '- item' lines
+      const items = []
+      i++
+      while (i < lines.length && /^\s+-\s/.test(lines[i])) {
+        items.push(lines[i].replace(/^\s+-\s+/, '').replace(/^["']|["']$/g, ''))
+        i++
+      }
+      if (items.length > 0) data[key] = items
     } else {
       data[key] = val.replace(/^["']|["']$/g, '')
+      i++
     }
-  })
+  }
 
   return { data, content: match[2].trim() }
 }

@@ -7,7 +7,6 @@ import MusicModal  from './components/MusicModal.jsx'
 import Gallery     from './pages/Gallery.jsx'
 import About       from './pages/About.jsx'
 import Contact     from './pages/Contact.jsx'
-import Admin       from './pages/Admin.jsx'
 import { loadPhotos } from './lib/photos.js'
 
 const photos = loadPhotos()
@@ -25,8 +24,6 @@ function useHash() {
 export default function App() {
   const route        = useHash()
 
-  // Admin is a completely standalone UI — no nav, preloader, or music player
-  if (route === '/admin') return <Admin />
   const [ready,      setReady]     = useState(false)
   const [showModal,  setShowModal] = useState(false)
   const miniPlayerRef = useRef(null)
