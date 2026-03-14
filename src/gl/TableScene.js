@@ -92,7 +92,14 @@ export class TableScene {
 
   _init() {
     const { canvas } = this
-    this.renderer = new WebGLRenderer({ canvas, antialias: false })
+    try {
+      this.renderer = new WebGLRenderer({ canvas, antialias: false })
+    } catch (e) {
+      // WebGL unavailable — signal ready immediately so the preloader doesn't stall
+      // for 8 seconds. Background canvas stays black but the rest of the UI works.
+      this._onReady?.()
+      return
+    }
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
 
     this.scene  = new Scene()
@@ -144,6 +151,7 @@ export class TableScene {
   }
 
   _resize() {
+    if (!this.renderer) return
     const w  = window.innerWidth
     const h  = window.innerHeight
     const pr = this.renderer.getPixelRatio()
@@ -155,6 +163,7 @@ export class TableScene {
   _bindEvents() {
     this._onResize    = () => this._resize()
     this._onMouseMove = (e) => {
+      if (!this.renderer) return
       const pr = this.renderer.getPixelRatio()
       this._targetMouse.set(e.clientX * pr, e.clientY * pr)
     }
@@ -163,6 +172,7 @@ export class TableScene {
   }
 
   start() {
+    if (!this.renderer) return
     const tick = (t) => {
       this._animId = requestAnimationFrame(tick)
       this.uniforms.uTime.value = t * 0.001
@@ -190,6 +200,6 @@ export class TableScene {
     document.removeEventListener('visibilitychange', this._onVisibility)
     window.removeEventListener('resize',    this._onResize)
     window.removeEventListener('mousemove', this._onMouseMove)
-    this.renderer.dispose()
+    this.renderer?.dispose()
   }
 }
