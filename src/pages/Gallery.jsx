@@ -37,10 +37,13 @@ function makeBatch(photos, seed) {
   if (!photos.length) return []
   const count = Math.min(BATCH, photos.length)
   const rng = seededRng(seed * 4049 + 7)
-  const rest = Array.from({ length: count - 1 }, () =>
-    photos[Math.floor(rng() * photos.length)]
-  )
-  return [photos[0], ...rest]   // latest always first
+  // Fisher-Yates shuffle of the remaining photos so every card is unique
+  const pool = photos.slice(1)
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]]
+  }
+  return [photos[0], ...pool.slice(0, count - 1)]  // latest always first
 }
 
 function computeScatter(count, seed, exclusion = null) {
