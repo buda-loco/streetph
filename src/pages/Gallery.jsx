@@ -293,36 +293,48 @@ export default function Gallery({ photos, onAssetLoaded, ready }) {
     // else: leave in pendingAnimRef; ready useEffect fires all deferred animations
   }, [onAssetLoaded])
 
-  // ── Filter blow-away ────────────────────────────────────────────────
+  // ── Filter pile / restore ────────────────────────────────────────────
+  //
+  // State machine:
+  //   activeTag set   → all cards drift to centre pile; matching: opacity 1, non-matching: opacity 0
+  //   activeTag null  → all cards return to scatter (x:0, y:0)
+  //
+  // Deterministic pile offsets ensure every tag produces the same central arrangement.
+  // PILE and table dims are hoisted above the loop (avoid 9× DOM reads + array re-creation).
   useEffect(() => {
+    const sleeperIdx = batch.length - 1
+    const table = cardRefs.current[0]?.closest('.scatter-table')
+    const tW = table?.offsetWidth  || window.innerWidth
+    const tH = table?.offsetHeight || window.innerHeight
+
+    // Deterministic pile offsets by index — same arrangement for every tag
+    const PILE = [
+      { dx:   0, dy:   0, r:  3 },
+      { dx: -18, dy:  12, r: -8 },
+      { dx:  22, dy:  -8, r:  5 },
+      { dx: -10, dy: -18, r: 12 },
+      { dx:  14, dy:  20, r: -6 },
+      { dx: -24, dy:   6, r: 10 },
+      { dx:  10, dy: -24, r: -4 },
+      { dx:  28, dy:  14, r:  7 },
+      { dx: -16, dy:  26, r: -9 },
+    ]
+
     batch.forEach((photo, i) => {
       const el = cardRefs.current[i]
       if (!el || !layout[i]) return
       const { rotation, zIndex } = layout[i]
       const matches = !activeTag || photo.tags.includes(activeTag)
 
+      // Sleeper renders at sleeperPos, not layout[i] — use the correct CSS base
+      const cssX = i === sleeperIdx ? sleeperPos.x : layout[i].x
+      const cssY = i === sleeperIdx ? sleeperPos.y : layout[i].y
+      const baseX = (cssX / 100) * tW
+      const baseY = (cssY / 100) * tH
+
       if (matches) {
-        // No filter → return each card to its scatter position
-        // Filter active → pile all matching cards in the centre with slight jitter
         let tx = 0, ty = 0, rot = rotation
         if (activeTag) {
-          const table = el.closest('.scatter-table')
-          const tW = table?.offsetWidth  || window.innerWidth
-          const tH = table?.offsetHeight || window.innerHeight
-          const baseX = (layout[i].x / 100) * tW
-          const baseY = (layout[i].y / 100) * tH
-          // Deterministic pile offsets by index so every tag produces the same central arrangement
-          const PILE = [
-            { dx:   0, dy:   0, r:  3 },
-            { dx: -18, dy:  12, r: -8 },
-            { dx:  22, dy:  -8, r:  5 },
-            { dx: -10, dy: -18, r: 12 },
-            { dx:  14, dy:  20, r: -6 },
-            { dx: -24, dy:   6, r: 10 },
-            { dx:  10, dy: -24, r: -4 },
-            { dx:  28, dy:  14, r:  7 },
-            { dx: -16, dy:  26, r: -9 },
-          ]
           const p = PILE[i % PILE.length]
           tx = (tW * 0.5 - baseX) + p.dx
           ty = (tH * 0.5 - baseY) + p.dy
@@ -335,21 +347,16 @@ export default function Gallery({ photos, onAssetLoaded, ready }) {
           onStart: () => { el.style.pointerEvents = '' },
         })
       } else {
-        // Non-matching: also drift to centre but fade out so everything gathers inward
-        const table = el.closest('.scatter-table')
-        const tW = table?.offsetWidth  || window.innerWidth
-        const tH = table?.offsetHeight || window.innerHeight
-        const baseX = (layout[i].x / 100) * tW
-        const baseY = (layout[i].y / 100) * tH
-        const tx = (tW * 0.5 - baseX) + (i % 3 - 1) * 30
-        const ty = (tH * 0.5 - baseY) + (i % 2 - 0.5) * 30
+        // Non-matching: drift to centre and fade out
+        const p = PILE[i % PILE.length]
         gsap.to(el, {
-          x: tx, y: ty,
-          rotation: (i % 5 - 2) * 8,
+          x: (tW * 0.5 - baseX) + p.dx * 1.5,
+          y: (tH * 0.5 - baseY) + p.dy * 1.5,
+          rotation: p.r * 2,
           opacity: 0,
           duration: 0.45,
           ease: 'power2.in',
-          delay: Math.random() * 0.1,
+          delay: 0.03 * i,
           onStart: () => { el.style.pointerEvents = 'none' },
         })
       }
