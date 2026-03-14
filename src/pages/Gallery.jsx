@@ -311,10 +311,22 @@ export default function Gallery({ photos, onAssetLoaded, ready }) {
           const tH = table?.offsetHeight || window.innerHeight
           const baseX = (layout[i].x / 100) * tW
           const baseY = (layout[i].y / 100) * tH
-          // All cards converge on table centre + small random offset for a natural pile
-          tx = (tW * 0.5 - baseX) + (Math.random() - 0.5) * 50
-          ty = (tH * 0.5 - baseY) + (Math.random() - 0.5) * 50
-          rot = (Math.random() - 0.5) * 28
+          // Deterministic pile offsets by index so every tag produces the same central arrangement
+          const PILE = [
+            { dx:   0, dy:   0, r:  3 },
+            { dx: -18, dy:  12, r: -8 },
+            { dx:  22, dy:  -8, r:  5 },
+            { dx: -10, dy: -18, r: 12 },
+            { dx:  14, dy:  20, r: -6 },
+            { dx: -24, dy:   6, r: 10 },
+            { dx:  10, dy: -24, r: -4 },
+            { dx:  28, dy:  14, r:  7 },
+            { dx: -16, dy:  26, r: -9 },
+          ]
+          const p = PILE[i % PILE.length]
+          tx = (tW * 0.5 - baseX) + p.dx
+          ty = (tH * 0.5 - baseY) + p.dy
+          rot = p.r
         }
         gsap.to(el, {
           x: tx, y: ty, rotation: rot, opacity: 1, zIndex,
@@ -329,11 +341,11 @@ export default function Gallery({ photos, onAssetLoaded, ready }) {
         const tH = table?.offsetHeight || window.innerHeight
         const baseX = (layout[i].x / 100) * tW
         const baseY = (layout[i].y / 100) * tH
-        const tx = (tW * 0.5 - baseX) + (Math.random() - 0.5) * 80
-        const ty = (tH * 0.5 - baseY) + (Math.random() - 0.5) * 80
+        const tx = (tW * 0.5 - baseX) + (i % 3 - 1) * 30
+        const ty = (tH * 0.5 - baseY) + (i % 2 - 0.5) * 30
         gsap.to(el, {
           x: tx, y: ty,
-          rotation: (Math.random() - 0.5) * 30,
+          rotation: (i % 5 - 2) * 8,
           opacity: 0,
           duration: 0.45,
           ease: 'power2.in',
