@@ -28,7 +28,7 @@ body {
 .preloader {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 100001;
   background: var(--bg);
   display: flex;
   flex-direction: column;
