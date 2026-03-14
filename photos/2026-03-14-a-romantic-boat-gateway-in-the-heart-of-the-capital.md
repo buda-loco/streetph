@@ -1,5 +1,5 @@
 ---
-title: A romantic boat gateway in the heart of the capital.
+title: Little boat
 date: 2026-02-28
 location: Lake Burley Griffin
 tags:
