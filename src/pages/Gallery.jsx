@@ -16,12 +16,14 @@ import { CUP_TARGET } from '../lib/tableLayout.js'
 const BATCH = 9
 
 // Zones keep cards spread but overlapping looks natural — like a real table
-// Right/bottom zones capped to keep cards clear of the coffee cup plate area
-const X_ZONES = [[8, 34], [30, 58], [54, 76]]
-const Y_ZONES = [[30, 45], [40, 62], [55, 78]]
+// Right/bottom bounds kept well clear of the coffee cup plate area
+const X_ZONES = [[6, 32], [24, 50], [40, 60]]
+const Y_ZONES = [[22, 38], [34, 54], [42, 62]]
 
-// Exclusion zone derived from where the cup actually sits (% of scatter-table)
-const CUP_EXCLUSION = { cx: CUP_TARGET.x * 100, cy: CUP_TARGET.y * 100, r: 26 }
+// Exclusion zone centred on the visible saucer plate (not the coffee liquid centre).
+// Radius is inflated to account for card body size so no card edge overlaps the ring.
+// ── Tune these if the cup plate moves: cx/cy are % of the scatter-table, r is radius %
+const CUP_EXCLUSION = { cx: 83, cy: 75, r: 36 }
 
 // ── Helpers ──────────────────────────────────────────────────────────
 function seededRng(seed) {
@@ -63,7 +65,7 @@ function computeScatter(count, seed, exclusion = null) {
       y = yMin + rng() * (yMax - yMin)
       tries++
     } while (
-      exclusion && tries < 10 &&
+      exclusion && tries < 30 &&
       Math.hypot(x - exclusion.cx, y - exclusion.cy) < exclusion.r
     )
 
